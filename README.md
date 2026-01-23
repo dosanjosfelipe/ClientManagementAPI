@@ -1,2 +1,2 @@
-# User Management
-## Um software de CRUD de gestão de usuários
+# Client Management
+## Um software CRUD de gestão de clientes

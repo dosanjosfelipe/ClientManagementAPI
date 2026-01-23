@@ -11,10 +11,10 @@
 	</parent>
 
 	<groupId>dev.felipe</groupId>
-	<artifactId>usermanagement</artifactId>
+	<artifactId>clientmanagement</artifactId>
 	<version>1.0.0</version>
-	<name>usermanagement</name>
-	<description>Um Software de Gestão de Usuários.</description>
+	<name>clientmanagement</name>
+	<description>Um Software de Gestão de Clientes.</description>
 	<packaging>jar</packaging>
 	<url>https://www.calma.com.br</url>
 
@@ -35,8 +35,8 @@
 	</developers>
 
 	<scm>
-		<connection>scm:https://github.com/dosanjosfelipe/UserManagement-Backend.git</connection>
-		<developerConnection>scm:git@github.com:dosanjosfelipe/UserManagement-Backend.git</developerConnection>
+		<connection>scm:https://github.com/dosanjosfelipe/ClientManagement-Backend.git</connection>
+		<developerConnection>scm:git@github.com:dosanjosfelipe/ClientManagement-Backend.git</developerConnection>
 		<url>https://github.com/dosanjosfelipe</url>
 		<tag>v1.0.0</tag>
 	</scm>
