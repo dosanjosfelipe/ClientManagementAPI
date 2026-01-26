@@ -25,6 +25,7 @@ public class UserRegisterController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody @Valid UserRegisterDTO dto) {
         userService.saveUser(dto);
+        
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message","Usuário registrado com sucesso."));
     }

@@ -12,12 +12,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleEmailAlreadyExists() {
+
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", "Esse email já foi registrado."));
     }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<Map<String, String>> handleDataBaseError() {
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Houve um erro no sistema, tente novamente mais tarde."));
     }
