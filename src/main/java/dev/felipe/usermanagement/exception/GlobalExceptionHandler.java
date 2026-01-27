@@ -1,8 +1,11 @@
 package dev.felipe.usermanagement.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.Map;
@@ -24,17 +27,32 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", "Houve um erro no sistema, tente novamente mais tarde."));
     }
 
-    @ExceptionHandler(EmailNotFound.class)
-    public ResponseEntity<Map<String, String>> handleEmailNotFound() {
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException() {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", "Email inexistente. Tente outro ou registre-se."));
+                .body(Map.of("message", "Usuário não encontrado. Tente outro ou registre-se."));
     }
 
     @ExceptionHandler(InvalidCredentials.class)
     public ResponseEntity<Map<String, String>> handleInvalidCredentials() {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "Senha incorreta, tente outra."));
+                .body(Map.of("message", "Usuário ou senha inválidos."));
     }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<Map<String, String>> handleExpiredToken() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("code", "TOKEN_EXPIRED"));
+    }
+
+    @ExceptionHandler({JwtException.class, IllegalArgumentException.class })
+    public ResponseEntity<Map<String, String>> handleJwtException() {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Acesso negado: token de acesso inválido."));
+    }
+
+
 }
