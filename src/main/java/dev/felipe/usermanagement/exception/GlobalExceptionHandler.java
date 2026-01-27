@@ -23,4 +23,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", "Houve um erro no sistema, tente novamente mais tarde."));
     }
+
+    @ExceptionHandler(EmailNotFound.class)
+    public ResponseEntity<Map<String, String>> handleEmailNotFound() {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Email inexistente. Tente outro ou registre-se."));
+    }
+
+    @ExceptionHandler(InvalidCredentials.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentials() {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Senha incorreta, tente outra."));
+    }
 }
