@@ -2,10 +2,11 @@ package dev.felipe.usermanagement.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor()
+@NoArgsConstructor
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames  = "email")})
 public class User {
@@ -22,5 +23,8 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Client> clients;
 
 }
