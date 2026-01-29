@@ -8,6 +8,8 @@ import dev.felipe.usermanagement.model.User;
 import dev.felipe.usermanagement.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ClientService {
 
@@ -34,5 +36,10 @@ public class ClientService {
         client.setOwner(user);
 
         clientRepository.save(client);
+    }
+
+    public List<Client> getClients(User user) {
+
+        return clientRepository.getClientByOwner_Id(user.getId());
     }
 }
