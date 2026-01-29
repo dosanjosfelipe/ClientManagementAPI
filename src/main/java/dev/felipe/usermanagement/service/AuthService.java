@@ -14,11 +14,11 @@ import java.sql.Date;
 import java.time.Instant;
 
 @Service
-public class JwtService {
+public class AuthService {
 
     private final SecretKey SECRET_KEY;
 
-    public JwtService(@Value("${jwt.secret}") String SECRET_KEY) {
+    public AuthService(@Value("${jwt.secret}") String SECRET_KEY) {
 
         this.SECRET_KEY = Keys.hmacShaKeyFor
                 (Decoders.BASE64.decode(SECRET_KEY));

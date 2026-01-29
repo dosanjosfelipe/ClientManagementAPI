@@ -1,5 +1,8 @@
 package dev.felipe.usermanagement.exception;
 
+import dev.felipe.usermanagement.exception.domain.EmailAlreadyExistsException;
+import dev.felipe.usermanagement.exception.domain.InvalidCredentials;
+import dev.felipe.usermanagement.exception.domain.PhoneAlreadyExistsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DataAccessException;

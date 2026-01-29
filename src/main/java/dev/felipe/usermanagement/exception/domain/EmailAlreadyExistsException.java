@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.exception;
+package dev.felipe.usermanagement.exception.domain;
 
 public class EmailAlreadyExistsException extends RuntimeException {
 

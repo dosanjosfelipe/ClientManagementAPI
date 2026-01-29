@@ -1,9 +1,9 @@
 package dev.felipe.usermanagement.controller;
 
-import dev.felipe.usermanagement.dto.UserLoginDTO;
-import dev.felipe.usermanagement.dto.UserRegisterDTO;
+import dev.felipe.usermanagement.dto.user.UserLoginDTO;
+import dev.felipe.usermanagement.dto.user.UserRegisterDTO;
 import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.service.JwtService;
+import dev.felipe.usermanagement.service.AuthService;
 import dev.felipe.usermanagement.service.UserService;
 import dev.felipe.usermanagement.utils.CookieGenerator;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,11 +25,11 @@ import static dev.felipe.usermanagement.security.TokenType.REFRESH;
 public class UserController {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final AuthService authService;
 
-    public UserController(UserService userService, JwtService jwtService) {
+    public UserController(UserService userService, AuthService authService) {
         this.userService = userService;
-        this.jwtService = jwtService;
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -37,8 +37,8 @@ public class UserController {
 
         User user = userService.authenticateUser(dto);
 
-        String accessToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
-        String refreshToken = jwtService.generateToken(user.getId(), user.getEmail(), user.getName(), REFRESH);
+        String accessToken = authService.generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
+        String refreshToken = authService.generateToken(user.getId(), user.getEmail(), user.getName(), REFRESH);
 
         ResponseCookie accessCookie = CookieGenerator.generateCookie("access_token", accessToken, 3600);
         ResponseCookie refreshCookie = CookieGenerator.generateCookie("refresh_token", refreshToken, 604800);

@@ -2,7 +2,7 @@ package dev.felipe.usermanagement.controller;
 
 import dev.felipe.usermanagement.model.User;
 import dev.felipe.usermanagement.repository.UserRepository;
-import dev.felipe.usermanagement.service.JwtService;
+import dev.felipe.usermanagement.service.AuthService;
 import dev.felipe.usermanagement.utils.CookieGenerator;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,11 +18,11 @@ import static dev.felipe.usermanagement.security.TokenType.ACCESS;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final JwtService jwtService;
+    private final AuthService authService;
     private final UserRepository userRepository;
 
-    public AuthController(JwtService jwtService, UserRepository userRepository) {
-        this.jwtService = jwtService;
+    public AuthController(AuthService authService, UserRepository userRepository) {
+        this.authService = authService;
         this.userRepository = userRepository;
     }
 
@@ -34,7 +34,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Claims claims = jwtService.validateToken(refreshToken);
+        Claims claims = authService.validateToken(refreshToken);
         String type = claims.get("type", String.class);
 
         if (!"REFRESH".equals(type)) {
@@ -45,7 +45,7 @@ public class AuthController {
                 .orElseThrow(() ->
                         new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
 
-        String newAccessToken = jwtService.
+        String newAccessToken = authService.
                 generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
         ResponseCookie newAccessCookie = CookieGenerator
                 .generateCookie("access_token", newAccessToken,3600);

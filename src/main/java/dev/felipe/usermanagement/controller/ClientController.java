@@ -1,8 +1,8 @@
 package dev.felipe.usermanagement.controller;
 
-import dev.felipe.usermanagement.dto.ClientDTO;
-import dev.felipe.usermanagement.dto.ClientResponseDTO;
-import dev.felipe.usermanagement.dto.ClientResponseItemsDTO;
+import dev.felipe.usermanagement.dto.client.ClientDTO;
+import dev.felipe.usermanagement.dto.client.ClientResponseDTO;
+import dev.felipe.usermanagement.dto.client.ClientResponseItemsDTO;
 import dev.felipe.usermanagement.model.Client;
 import dev.felipe.usermanagement.model.User;
 import dev.felipe.usermanagement.service.ClientService;

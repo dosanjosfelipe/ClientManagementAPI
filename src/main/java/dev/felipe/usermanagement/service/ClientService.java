@@ -1,8 +1,8 @@
 package dev.felipe.usermanagement.service;
 
-import dev.felipe.usermanagement.dto.ClientDTO;
-import dev.felipe.usermanagement.exception.EmailAlreadyExistsException;
-import dev.felipe.usermanagement.exception.PhoneAlreadyExistsException;
+import dev.felipe.usermanagement.dto.client.ClientDTO;
+import dev.felipe.usermanagement.exception.domain.EmailAlreadyExistsException;
+import dev.felipe.usermanagement.exception.domain.PhoneAlreadyExistsException;
 import dev.felipe.usermanagement.model.Client;
 import dev.felipe.usermanagement.model.User;
 import dev.felipe.usermanagement.repository.ClientRepository;
