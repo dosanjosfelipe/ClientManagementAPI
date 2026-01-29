@@ -54,5 +54,12 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", "Acesso negado: token de acesso inválido."));
     }
 
+    @ExceptionHandler(PhoneAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handlePhoneAlreadyExistsException() {
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", "Esse telefone já foi registrado."));
+    }
+
 
 }

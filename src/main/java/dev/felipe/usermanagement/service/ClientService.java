@@ -2,6 +2,7 @@ package dev.felipe.usermanagement.service;
 
 import dev.felipe.usermanagement.dto.ClientDTO;
 import dev.felipe.usermanagement.exception.EmailAlreadyExistsException;
+import dev.felipe.usermanagement.exception.PhoneAlreadyExistsException;
 import dev.felipe.usermanagement.model.Client;
 import dev.felipe.usermanagement.model.User;
 import dev.felipe.usermanagement.repository.ClientRepository;
@@ -21,7 +22,9 @@ public class ClientService {
             throw new EmailAlreadyExistsException();
         }
 
-        //! VERIFICAR TELEFONE
+        if (clientRepository.findByPhone(dto.phone()).isPresent()) {
+            throw new PhoneAlreadyExistsException();
+        }
 
         Client client = new Client();
 
