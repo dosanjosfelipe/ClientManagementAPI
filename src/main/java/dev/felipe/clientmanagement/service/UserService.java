@@ -1,11 +1,11 @@
-package dev.felipe.usermanagement.service;
+package dev.felipe.clientmanagement.service;
 
-import dev.felipe.usermanagement.dto.user.UserLoginDTO;
-import dev.felipe.usermanagement.dto.user.UserRegisterDTO;
-import dev.felipe.usermanagement.exception.domain.EmailAlreadyExistsException;
-import dev.felipe.usermanagement.exception.domain.InvalidCredentials;
-import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.repository.UserRepository;
+import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
+import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
+import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
+import dev.felipe.clientmanagement.exception.domain.InvalidCredentials;
+import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

@@ -1,8 +1,8 @@
-package dev.felipe.usermanagement.utils;
+package dev.felipe.clientmanagement.utils;
 
-import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.repository.UserRepository;
-import dev.felipe.usermanagement.service.AuthService;
+import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.repository.UserRepository;
+import dev.felipe.clientmanagement.service.AuthService;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
@@ -20,6 +20,7 @@ public class TokenUserExtractor {
 
     public User extractUser(String token) {
         Claims claims = authService.validateToken(token);
+
 
         return userRepository.findById(Long.valueOf(claims.getSubject()))
                 .orElseThrow(() -> new UsernameNotFoundException

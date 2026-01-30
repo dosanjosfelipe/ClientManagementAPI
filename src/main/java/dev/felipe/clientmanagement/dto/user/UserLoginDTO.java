@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.dto.user;
+package dev.felipe.clientmanagement.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

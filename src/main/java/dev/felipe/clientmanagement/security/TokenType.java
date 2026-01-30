@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.security;
+package dev.felipe.clientmanagement.security;
 
 public enum TokenType {
     ACCESS,

@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.utils;
+package dev.felipe.clientmanagement.utils;
 
 import org.springframework.http.ResponseCookie;
 

@@ -1,8 +1,9 @@
-package dev.felipe.usermanagement.exception;
+package dev.felipe.clientmanagement.exception;
 
-import dev.felipe.usermanagement.exception.domain.EmailAlreadyExistsException;
-import dev.felipe.usermanagement.exception.domain.InvalidCredentials;
-import dev.felipe.usermanagement.exception.domain.PhoneAlreadyExistsException;
+import dev.felipe.clientmanagement.exception.domain.ClientNotFoundException;
+import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
+import dev.felipe.clientmanagement.exception.domain.InvalidCredentials;
+import dev.felipe.clientmanagement.exception.domain.PhoneAlreadyExistsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.dao.DataAccessException;
@@ -62,6 +63,13 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", "Esse telefone já foi registrado."));
+    }
+
+    @ExceptionHandler(ClientNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleClientNotFoundException() {
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Cliente não encontrado."));
     }
 
 

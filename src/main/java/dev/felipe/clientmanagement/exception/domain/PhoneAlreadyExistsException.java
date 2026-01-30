@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.exception.domain;
+package dev.felipe.clientmanagement.exception.domain;
 
 public class PhoneAlreadyExistsException extends RuntimeException {
     public PhoneAlreadyExistsException() {

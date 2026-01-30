@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.dto.client;
+package dev.felipe.clientmanagement.dto.client;
 
 import java.time.LocalDate;
 

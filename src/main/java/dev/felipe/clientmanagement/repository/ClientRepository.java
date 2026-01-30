@@ -1,6 +1,6 @@
-package dev.felipe.usermanagement.repository;
+package dev.felipe.clientmanagement.repository;
 
-import dev.felipe.usermanagement.model.Client;
+import dev.felipe.clientmanagement.model.Client;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

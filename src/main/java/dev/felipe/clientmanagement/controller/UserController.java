@@ -1,11 +1,11 @@
-package dev.felipe.usermanagement.controller;
+package dev.felipe.clientmanagement.controller;
 
-import dev.felipe.usermanagement.dto.user.UserLoginDTO;
-import dev.felipe.usermanagement.dto.user.UserRegisterDTO;
-import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.service.AuthService;
-import dev.felipe.usermanagement.service.UserService;
-import dev.felipe.usermanagement.utils.CookieGenerator;
+import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
+import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
+import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.service.UserService;
+import dev.felipe.clientmanagement.utils.CookieGenerator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
-import static dev.felipe.usermanagement.security.TokenType.ACCESS;
-import static dev.felipe.usermanagement.security.TokenType.REFRESH;
+import static dev.felipe.clientmanagement.security.TokenType.ACCESS;
+import static dev.felipe.clientmanagement.security.TokenType.REFRESH;
 
 @RestController
 @RequestMapping("/api/v1/users")

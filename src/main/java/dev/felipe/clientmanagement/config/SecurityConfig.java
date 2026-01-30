@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.config;
+package dev.felipe.clientmanagement.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

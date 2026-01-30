@@ -1,8 +1,8 @@
-package dev.felipe.usermanagement.controller;
+package dev.felipe.clientmanagement.controller;
 
-import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.service.AuthService;
-import dev.felipe.usermanagement.utils.CookieGenerator;
+import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.utils.CookieGenerator;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import static dev.felipe.usermanagement.security.TokenType.ACCESS;
+import static dev.felipe.clientmanagement.security.TokenType.ACCESS;
 
 @RestController
 @RequestMapping("/api/v1/auth")

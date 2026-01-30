@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.model;
+package dev.felipe.clientmanagement.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
