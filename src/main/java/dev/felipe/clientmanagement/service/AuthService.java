@@ -1,18 +1,18 @@
-package dev.felipe.usermanagement.service;
+package dev.felipe.clientmanagement.service;
 
-import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.repository.UserRepository;
-import dev.felipe.usermanagement.security.TokenType;
+import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.repository.UserRepository;
+import dev.felipe.clientmanagement.security.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.Instant;
 
@@ -25,8 +25,10 @@ public class AuthService {
     public AuthService(@Value("${jwt.secret}") String SECRET_KEY,
                        UserRepository userRepository) {
 
-        this.SECRET_KEY = Keys.hmacShaKeyFor
-                (Decoders.BASE64.decode(SECRET_KEY));
+        this.SECRET_KEY = Keys.hmacShaKeyFor(
+                SECRET_KEY.getBytes(StandardCharsets.UTF_8)
+        );
+
         this.userRepository = userRepository;
     }
 
@@ -50,7 +52,7 @@ public class AuthService {
                 .claim("name", name)
                 .claim("type", TokenType.ACCESS.name())
                 .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plusSeconds(20)))
+                .setExpiration(Date.from(now.plusSeconds(3600)))
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
