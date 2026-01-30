@@ -1,4 +1,4 @@
-package dev.felipe.usermanagement.config;
+package dev.felipe.clientmanagement.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +15,8 @@ public class WebConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of("https://localhost:5173"));
-        config.setAllowedMethods(List.of("POST", "GET", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Auth-Token"));
+        config.setAllowedMethods(List.of("POST", "GET", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
