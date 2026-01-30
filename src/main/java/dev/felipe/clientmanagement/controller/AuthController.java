@@ -1,7 +1,6 @@
 package dev.felipe.usermanagement.controller;
 
 import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.repository.UserRepository;
 import dev.felipe.usermanagement.service.AuthService;
 import dev.felipe.usermanagement.utils.CookieGenerator;
 import io.jsonwebtoken.Claims;
@@ -10,7 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import static dev.felipe.usermanagement.security.TokenType.ACCESS;
 
@@ -19,14 +17,12 @@ import static dev.felipe.usermanagement.security.TokenType.ACCESS;
 public class AuthController {
 
     private final AuthService authService;
-    private final UserRepository userRepository;
 
-    public AuthController(AuthService authService, UserRepository userRepository) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.userRepository = userRepository;
     }
 
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<Void> refreshAuth(@CookieValue(value = "refresh_token",
             required = false) String refreshToken, HttpServletResponse response) {
 
@@ -41,9 +37,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = userRepository.findById(Long.valueOf(claims.getSubject()))
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
+        User user = authService.findUserByClaim(claims);
 
         String newAccessToken = authService.
                 generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);

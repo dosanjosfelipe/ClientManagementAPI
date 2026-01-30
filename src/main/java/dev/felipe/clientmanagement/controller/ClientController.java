@@ -1,12 +1,12 @@
-package dev.felipe.usermanagement.controller;
+package dev.felipe.clientmanagement.controller;
 
-import dev.felipe.usermanagement.dto.client.ClientDTO;
-import dev.felipe.usermanagement.dto.client.ClientResponseDTO;
-import dev.felipe.usermanagement.dto.client.ClientResponseItemsDTO;
-import dev.felipe.usermanagement.model.Client;
-import dev.felipe.usermanagement.model.User;
-import dev.felipe.usermanagement.service.ClientService;
-import dev.felipe.usermanagement.utils.TokenUserExtractor;
+import dev.felipe.clientmanagement.dto.client.ClientDTO;
+import dev.felipe.clientmanagement.dto.client.ClientResponseDTO;
+import dev.felipe.clientmanagement.dto.client.ClientResponseItemsDTO;
+import dev.felipe.clientmanagement.model.Client;
+import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.service.ClientService;
+import dev.felipe.clientmanagement.utils.TokenUserExtractor;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,8 @@ public class ClientController {
         this.tokenUserExtractor = tokenUserExtractor;
     }
 
-    @PostMapping("/new")
-    public ResponseEntity<Map<String, String>> newClient(@CookieValue(name = "access_token", required = false) String token,
+    @PostMapping
+    public ResponseEntity<Map<String, String>> create(@CookieValue(name = "access_token", required = false) String token,
                                     @RequestBody @Valid ClientDTO dto) {
 
         if (token == null) {
@@ -42,8 +42,9 @@ public class ClientController {
                 .body(Map.of("message","Cliente registrado com sucesso."));
     }
 
-    @GetMapping("/show")
-    public ResponseEntity<ClientResponseDTO> showClients(@CookieValue(name = "access_token", required = false) String token) {
+    @GetMapping
+    public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
+            @CookieValue(name = "access_token", required = false) String token) {
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -66,5 +67,21 @@ public class ClientController {
 
         return ResponseEntity.status(HttpStatus.OK).body(new ClientResponseDTO(response, response.size()));
 
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Map<String, String>> update(@PathVariable String id,
+                                       @CookieValue(name = "access_token", required = false) String token,
+                                       @RequestBody ClientDTO dto) {
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+
+        clientService.updateClient(Long.valueOf(id), dto);
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Cliente editado com sucesso."));
     }
 }
