@@ -56,4 +56,11 @@ public class ClientService {
         clientRepository.save(client);
     }
 
+    public void deleteClient(Long clientId) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(ClientNotFoundException::new);
+
+        clientRepository.delete(client);
+    }
+
 }

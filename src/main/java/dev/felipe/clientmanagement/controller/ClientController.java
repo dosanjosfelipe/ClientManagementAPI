@@ -78,10 +78,23 @@ public class ClientController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-
         clientService.updateClient(Long.valueOf(id), dto);
 
+        return ResponseEntity.status(HttpStatus.OK).body(
+                Map.of("message", "Cliente editado com sucesso."));
+    }
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Cliente editado com sucesso."));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> delete(@PathVariable String id,
+                                                      @CookieValue(name = "access_token") String token) {
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        clientService.deleteClient(Long.valueOf(id));
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                Map.of("message", "Cliente deletado com sucesso."));
     }
 }
