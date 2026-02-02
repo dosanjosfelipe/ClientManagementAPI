@@ -7,6 +7,7 @@ import dev.felipe.clientmanagement.exception.domain.PhoneAlreadyExistsException;
 import dev.felipe.clientmanagement.model.Client;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.repository.ClientRepository;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -39,9 +40,14 @@ public class ClientService {
         clientRepository.save(client);
     }
 
-    public List<Client> getClients(User user) {
+    public List<Client> getClients(User user, String page) {
 
-        return clientRepository.getClientByOwner_Id(user.getId());
+        PageRequest pageRequest = PageRequest.of(Integer.parseInt(page), 11);
+        return clientRepository.getClientByOwner_Id(user.getId(), pageRequest);
+    }
+
+    public int getClientsSize(User user) {
+        return clientRepository.getClientSizeByOwner_Id(user.getId());
     }
 
     public void updateClient(Long clientId, ClientDTO dto) {

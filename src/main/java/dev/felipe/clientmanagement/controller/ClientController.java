@@ -42,8 +42,9 @@ public class ClientController {
                 .body(Map.of("message","Cliente registrado com sucesso."));
     }
 
-    @GetMapping
+    @GetMapping("/{page}")
     public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
+            @PathVariable String page,
             @CookieValue(name = "access_token", required = false) String token) {
 
         if (token == null) {
@@ -52,7 +53,7 @@ public class ClientController {
 
         User user = tokenUserExtractor.extractUser(token);
 
-        List<Client> clients = clientService.getClients(user);
+        List<Client> clients = clientService.getClients(user, page);
 
         List<ClientResponseItemsDTO> response = clients.stream()
                 .map(client -> new ClientResponseItemsDTO(
@@ -65,7 +66,9 @@ public class ClientController {
                 ))
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ClientResponseDTO(response, response.size()));
+        int clientsSize = clientService.getClientsSize(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body(new ClientResponseDTO(response, clientsSize));
 
     }
 
