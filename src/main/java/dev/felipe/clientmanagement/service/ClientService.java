@@ -40,9 +40,9 @@ public class ClientService {
         clientRepository.save(client);
     }
 
-    public List<Client> getClients(User user, String page) {
+    public List<Client> getClients(User user, int page) {
 
-        PageRequest pageRequest = PageRequest.of(Integer.parseInt(page), 11);
+        PageRequest pageRequest = PageRequest.of(page, 11);
         return clientRepository.getClientByOwner_Id(user.getId(), pageRequest);
     }
 

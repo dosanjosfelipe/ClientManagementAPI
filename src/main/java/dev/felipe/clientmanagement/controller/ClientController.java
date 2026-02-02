@@ -42,9 +42,9 @@ public class ClientController {
                 .body(Map.of("message","Cliente registrado com sucesso."));
     }
 
-    @GetMapping("/{page}")
+    @GetMapping()
     public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
-            @PathVariable String page,
+            @RequestParam int page,
             @CookieValue(name = "access_token", required = false) String token) {
 
         if (token == null) {
