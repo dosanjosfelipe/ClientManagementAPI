@@ -5,10 +5,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import java.util.List;
+import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
@@ -18,9 +19,20 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
                                  @NotBlank
                                  @Size(min = 10, max = 11) String phone);
 
-
-    List<Client> getClientByOwner_Id(Long ownerId, Pageable pageable);
-
-    @Query("SELECT COUNT(c) FROM Client c WHERE c.owner.id = :ownerId")
-    int getClientSizeByOwner_Id(Long ownerId);
+    @Query("""
+    SELECT c
+    FROM Client c
+    WHERE c.owner.id = :ownerId
+      AND (
+            :search IS NULL
+         OR LOWER(c.name)  LIKE LOWER(CONCAT('%', :search, '%'))
+         OR LOWER(c.email) LIKE LOWER(CONCAT('%', :search, '%'))
+         OR c.phone        LIKE CONCAT('%', :search, '%')
+      )
+""")
+    Page<Client> findSearchClientByOwner_Id(
+            @Param("ownerId") Long ownerId,
+            @Param("search") String search,
+            Pageable pageable
+    );
 }

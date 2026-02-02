@@ -8,6 +8,7 @@ import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.service.ClientService;
 import dev.felipe.clientmanagement.utils.TokenUserExtractor;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,7 @@ public class ClientController {
     @GetMapping()
     public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
             @RequestParam int page,
+            @RequestParam(required = false) String search,
             @CookieValue(name = "access_token", required = false) String token) {
 
         if (token == null) {
@@ -53,7 +55,7 @@ public class ClientController {
 
         User user = tokenUserExtractor.extractUser(token);
 
-        List<Client> clients = clientService.getClients(user, page);
+        Page<Client> clients = clientService.getClients(user, page, search);
 
         List<ClientResponseItemsDTO> response = clients.stream()
                 .map(client -> new ClientResponseItemsDTO(
@@ -66,9 +68,7 @@ public class ClientController {
                 ))
                 .toList();
 
-        int clientsSize = clientService.getClientsSize(user);
-
-        return ResponseEntity.status(HttpStatus.OK).body(new ClientResponseDTO(response, clientsSize));
+        return ResponseEntity.status(HttpStatus.OK).body(new ClientResponseDTO(response, clients.getTotalElements()));
 
     }
 
