@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody @Valid UserLoginDTO dto, HttpServletResponse response) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody @Valid UserLoginDTO dto, HttpServletResponse response) {
 
         User user = userService.authenticateUser(dto);
 
@@ -46,7 +46,8 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("username", user.getName().split(" ")[0]));
      }
 
     @PostMapping("/register")
