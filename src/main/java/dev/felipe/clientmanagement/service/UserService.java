@@ -48,4 +48,9 @@ public class UserService {
 
         return user;
     }
+
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
+    }
 }

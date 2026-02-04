@@ -1,8 +1,10 @@
 package dev.felipe.clientmanagement.controller;
 
 import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.security.TokenType;
 import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.utils.CookieGenerator;
+import dev.felipe.clientmanagement.utils.TokenUserExtractor;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
 import static dev.felipe.clientmanagement.security.TokenType.ACCESS;
 
 @RestController
@@ -17,9 +22,11 @@ import static dev.felipe.clientmanagement.security.TokenType.ACCESS;
 public class AuthController {
 
     private final AuthService authService;
+    private final TokenUserExtractor tokenUserExtractor;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, TokenUserExtractor tokenUserExtractor) {
         this.authService = authService;
+        this.tokenUserExtractor = tokenUserExtractor;
     }
 
     @PostMapping("/refresh")
@@ -48,5 +55,21 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
 
+    }
+
+    @GetMapping("/share")
+    public ResponseEntity<Map<String, String>> share(@CookieValue(name = "access_token") String token) {
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = tokenUserExtractor.extractUser(token);
+
+        String readToken = authService.generateToken(user.getId(), null, null, TokenType.READ);
+
+        String URL = "https://localhost:5173/dashboard/visitor?token=" + readToken;
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("shareLink", URL));
     }
 }

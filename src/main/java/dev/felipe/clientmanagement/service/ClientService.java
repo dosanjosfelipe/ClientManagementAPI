@@ -10,7 +10,6 @@ import dev.felipe.clientmanagement.repository.ClientRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 public class ClientService {

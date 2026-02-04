@@ -5,8 +5,11 @@ import dev.felipe.clientmanagement.dto.client.ClientResponseDTO;
 import dev.felipe.clientmanagement.dto.client.ClientResponseItemsDTO;
 import dev.felipe.clientmanagement.model.Client;
 import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.ClientService;
+import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.TokenUserExtractor;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,14 +24,20 @@ public class ClientController {
 
     private final ClientService clientService;
     private final TokenUserExtractor tokenUserExtractor;
+    private final AuthService authService;
+    private final UserService userService;
 
-    public ClientController(ClientService clientService, TokenUserExtractor tokenUserExtractor) {
+    public ClientController(ClientService clientService,
+                            TokenUserExtractor tokenUserExtractor, AuthService authService, UserService userService) {
         this.clientService = clientService;
         this.tokenUserExtractor = tokenUserExtractor;
+        this.authService = authService;
+        this.userService = userService;
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> create(@CookieValue(name = "access_token", required = false) String token,
+    public ResponseEntity<Map<String, String>> create(
+            @CookieValue(name = "access_token", required = false) String token,
                                     @RequestBody @Valid ClientDTO dto) {
 
         if (token == null) {
@@ -45,17 +54,33 @@ public class ClientController {
 
     @GetMapping()
     public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
+            @RequestHeader(name = "Authorization", required = false) String visitorToken,
             @RequestParam int page,
             @RequestParam(required = false) String search,
             @CookieValue(name = "access_token", required = false) String token) {
+
+        System.out.println("ACCESS_TOKEN: " + token);
+        System.out.println("VISITOR_TOKEN: " + visitorToken);
+        System.out.println("PAGE: " + page);
+        System.out.println("SEARCH: " + search);
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        User user = tokenUserExtractor.extractUser(token);
+        Page<Client> clients;
 
-        Page<Client> clients = clientService.getClients(user, page, search);
+        if (visitorToken != null) {
+            Claims claims = authService.validateToken(visitorToken);
+
+            Long ownerId = Long.valueOf(claims.getSubject());
+            User owner = userService.findUserById(ownerId);
+
+             clients = clientService.getClients(owner, page, search);
+        } else {
+            User user = tokenUserExtractor.extractUser(token);
+            clients = clientService.getClients(user, page, search);
+        }
 
         List<ClientResponseItemsDTO> response = clients.stream()
                 .map(client -> new ClientResponseItemsDTO(
@@ -68,13 +93,15 @@ public class ClientController {
                 ))
                 .toList();
 
-        return ResponseEntity.status(HttpStatus.OK).body(new ClientResponseDTO(response, clients.getTotalElements()));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ClientResponseDTO(response, clients.getTotalElements()));
 
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<Map<String, String>> update(@PathVariable String id,
-                                       @CookieValue(name = "access_token", required = false) String token,
+                                       @CookieValue(name = "access_token", required = false)
+                                       String token,
                                        @RequestBody ClientDTO dto) {
 
         if (token == null) {
@@ -89,7 +116,8 @@ public class ClientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> delete(@PathVariable String id,
-                                                      @CookieValue(name = "access_token") String token) {
+                                                      @CookieValue(name = "access_token")
+                                                      String token) {
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
