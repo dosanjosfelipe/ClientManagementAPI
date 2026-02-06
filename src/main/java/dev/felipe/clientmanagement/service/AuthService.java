@@ -73,7 +73,6 @@ public class AuthService {
 
     public Claims validateToken(String token) {
 
-        System.out.println("CHEGUEI NO VALIDADOR DE TOKEN: " + token);
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(SECRET_KEY)
