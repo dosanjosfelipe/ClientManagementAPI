@@ -4,8 +4,8 @@ import org.springframework.http.ResponseCookie;
 
 public class CookieGenerator {
 
-    public static ResponseCookie generateCookie(String name, String token, long maxAge) {
-        return ResponseCookie.from(name, token)
+    public static ResponseCookie generateCookie(String name, String value, long maxAge) {
+        return ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
