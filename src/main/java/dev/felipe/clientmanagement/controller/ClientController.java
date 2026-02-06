@@ -59,11 +59,6 @@ public class ClientController {
             @RequestParam(required = false) String search,
             @CookieValue(name = "access_token", required = false) String token) {
 
-        System.out.println("ACCESS_TOKEN: " + token);
-        System.out.println("VISITOR_TOKEN: " + visitorToken);
-        System.out.println("PAGE: " + page);
-        System.out.println("SEARCH: " + search);
-
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -115,9 +110,9 @@ public class ClientController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable String id,
-                                                      @CookieValue(name = "access_token")
-                                                      String token) {
+    public ResponseEntity<Map<String, String>> delete(
+            @PathVariable String id,
+            @CookieValue(name = "access_token") String token) {
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

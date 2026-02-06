@@ -1,60 +1,53 @@
 package dev.felipe.clientmanagement.controller;
 
-import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
-import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
 import dev.felipe.clientmanagement.model.User;
-import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.UserService;
-import dev.felipe.clientmanagement.utils.CookieGenerator;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpHeaders;
+import dev.felipe.clientmanagement.utils.TokenUserExtractor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.util.Map;
-import static dev.felipe.clientmanagement.security.TokenType.ACCESS;
-import static dev.felipe.clientmanagement.security.TokenType.REFRESH;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/auth/user")
 public class UserController {
 
+    private final TokenUserExtractor tokenUserExtractor;
     private final UserService userService;
-    private final AuthService authService;
 
-    public UserController(UserService userService, AuthService authService) {
+    public UserController(TokenUserExtractor tokenUserExtractor, UserService userService) {
+        this.tokenUserExtractor = tokenUserExtractor;
         this.userService = userService;
-        this.authService = authService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody @Valid UserLoginDTO dto, HttpServletResponse response) {
+    @GetMapping()
+    public ResponseEntity<Map<String, String>> getCurrentUser(
+            @CookieValue(name = "access_token", required = false) String token) {
 
-        User user = userService.authenticateUser(dto);
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-        String accessToken = authService.generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
-        String refreshToken = authService.generateToken(user.getId(), user.getEmail(), user.getName(), REFRESH);
+        User user = tokenUserExtractor.extractUser(token);
 
-        ResponseCookie accessCookie = CookieGenerator.generateCookie("access_token", accessToken, 3600);
-        ResponseCookie refreshCookie = CookieGenerator.generateCookie("refresh_token", refreshToken, 604800);
-
-        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        String userId = String.valueOf(user.getId());
+        String userName = user.getName().split(" ")[0];
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of("username", user.getName().split(" ")[0]));
-     }
+                .body(Map.of("userName", userName, "userId", userId));
+    }
 
-    @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid UserRegisterDTO dto) {
-        userService.saveUser(dto);
+    @DeleteMapping("{id}")
+    public ResponseEntity<Map<String, String>> deleteUser(
+            @CookieValue(name = "access_token", required = false) String token,
+            @PathVariable Long id) {
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("message","Usuário registrado com sucesso."));
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        userService.deleteUser(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Usuário deletado com sucesso."));
     }
 }

@@ -53,4 +53,9 @@ public class UserService {
         return userRepository.findById(userId).orElseThrow(() ->
                 new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
     }
+
+    public void deleteUser(Long userId) {
+        User user = findUserById(userId);
+        userRepository.delete(user);
+    }
 }
