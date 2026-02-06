@@ -107,4 +107,25 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Map.of("message","Usuário registrado com sucesso."));
     }
+
+    @PostMapping("/auth/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response) {
+
+        if (accessToken == null) {
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        ResponseCookie expiredAccessToken = CookieGenerator
+                .generateCookie("access_token", accessToken, 0);
+        ResponseCookie expiredRefreshToken = CookieGenerator
+                .generateCookie("refresh_token", refreshToken, 0);
+
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredAccessToken.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, expiredRefreshToken.toString());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

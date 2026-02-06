@@ -31,7 +31,7 @@ public class UserController {
         User user = tokenUserExtractor.extractUser(token);
 
         String userId = String.valueOf(user.getId());
-        String userName = user.getName().split(" ")[0];
+        String userName = user.getName().trim().split("\\s+")[0];
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userName", userName, "userId", userId));
@@ -48,6 +48,7 @@ public class UserController {
 
         userService.deleteUser(id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("message", "Usuário deletado com sucesso."));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "Usuário deletado com sucesso."));
     }
 }
