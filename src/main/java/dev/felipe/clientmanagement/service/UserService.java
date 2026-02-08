@@ -2,6 +2,7 @@ package dev.felipe.clientmanagement.service;
 
 import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
 import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
+import dev.felipe.clientmanagement.dto.user.UserUpdateDTO;
 import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
 import dev.felipe.clientmanagement.exception.domain.InvalidCredentials;
 import dev.felipe.clientmanagement.model.User;
@@ -54,8 +55,16 @@ public class UserService {
                 new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
     }
 
-    public void deleteUser(Long userId) {
-        User user = findUserById(userId);
+    public void deleteUser(Long id) {
+        User user = findUserById(id);
         userRepository.delete(user);
+    }
+
+    public void updateUser(Long id, UserUpdateDTO dto) {
+        User user = findUserById(id);
+
+        user.setName(dto.username());
+
+        userRepository.save(user);
     }
 }

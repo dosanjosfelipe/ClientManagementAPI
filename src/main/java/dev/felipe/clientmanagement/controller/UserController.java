@@ -1,8 +1,10 @@
 package dev.felipe.clientmanagement.controller;
 
+import dev.felipe.clientmanagement.dto.user.UserUpdateDTO;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.TokenUserExtractor;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +33,13 @@ public class UserController {
         User user = tokenUserExtractor.extractUser(token);
 
         String userId = String.valueOf(user.getId());
-        String userName = user.getName().trim().split("\\s+")[0];
+        String userName = user.getName();
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("userName", userName, "userId", userId));
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deleteUser(
             @CookieValue(name = "access_token", required = false) String token,
             @PathVariable Long id) {
@@ -50,5 +52,20 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("message", "Usuário deletado com sucesso."));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Map<String, String>> updateUser(
+            @CookieValue(name = "access_token", required = false) String token,
+            @PathVariable Long id,
+            @Valid @RequestBody UserUpdateDTO dto) {
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        userService.updateUser(id, dto);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("message", "Usuário editado com sucesso."));
     }
 }
