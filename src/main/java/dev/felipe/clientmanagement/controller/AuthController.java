@@ -3,7 +3,6 @@ package dev.felipe.clientmanagement.controller;
 import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
 import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
 import dev.felipe.clientmanagement.model.User;
-import dev.felipe.clientmanagement.security.TokenType;
 import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.CookieGenerator;
@@ -25,12 +24,10 @@ import static dev.felipe.clientmanagement.security.TokenType.REFRESH;
 public class AuthController {
 
     private final AuthService authService;
-    private final TokenUserExtractor tokenUserExtractor;
     private final UserService userService;
 
     public AuthController(AuthService authService, TokenUserExtractor tokenUserExtractor, UserService userService) {
         this.authService = authService;
-        this.tokenUserExtractor = tokenUserExtractor;
         this.userService = userService;
     }
 
@@ -60,22 +57,6 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.OK).build();
 
-    }
-
-    @GetMapping("/auth/share")
-    public ResponseEntity<Map<String, String>> share(@CookieValue(name = "access_token") String token) {
-
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        User user = tokenUserExtractor.extractUser(token);
-
-        String readToken = authService.generateToken(user.getId(), null, null, TokenType.READ);
-
-        String URL = "https://localhost:5173/dashboard/visitor?token=" + readToken;
-
-        return ResponseEntity.status(HttpStatus.OK).body(Map.of("shareLink", URL));
     }
 
     @PostMapping("/login")

@@ -5,6 +5,7 @@ import dev.felipe.clientmanagement.dto.client.ClientResponseDTO;
 import dev.felipe.clientmanagement.dto.client.ClientResponseItemsDTO;
 import dev.felipe.clientmanagement.model.Client;
 import dev.felipe.clientmanagement.model.User;
+import dev.felipe.clientmanagement.security.TokenType;
 import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.ClientService;
 import dev.felipe.clientmanagement.service.UserService;
@@ -122,5 +123,21 @@ public class ClientController {
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 Map.of("message", "Cliente deletado com sucesso."));
+    }
+
+    @GetMapping("/share")
+    public ResponseEntity<Map<String, String>> share(@CookieValue(name = "access_token") String token) {
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User user = tokenUserExtractor.extractUser(token);
+
+        String readToken = authService.generateToken(user.getId(), null, null, TokenType.READ);
+
+        String URL = "https://localhost:5173/dashboard/visitor?token=" + readToken;
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of("shareLink", URL));
     }
 }
