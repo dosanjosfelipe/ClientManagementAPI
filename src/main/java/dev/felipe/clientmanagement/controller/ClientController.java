@@ -126,7 +126,8 @@ public class ClientController {
     }
 
     @GetMapping("/share")
-    public ResponseEntity<Map<String, String>> share(@CookieValue(name = "access_token") String token) {
+    public ResponseEntity<Map<String, String>> share(
+            @CookieValue(name = "access_token") String token) {
 
         if (token == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

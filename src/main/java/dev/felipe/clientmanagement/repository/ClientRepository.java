@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public interface ClientRepository extends JpaRepository<Client, Long> {
     Optional<Client> findByEmail(@NotBlank @Email String email);
@@ -34,5 +35,10 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             @Param("ownerId") Long ownerId,
             @Param("search") String search,
             Pageable pageable
+    );
+
+    @Query("SELECT c FROM Client c WHERE c.owner.id = :ownerId")
+    Stream<Client> streamAllByOwnerId(
+            @Param("ownerId") Long ownerId
     );
 }
