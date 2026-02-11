@@ -2,7 +2,7 @@ package dev.felipe.clientmanagement.utils;
 
 import org.springframework.http.ResponseCookie;
 
-public class CookieGenerator {
+public class CookieUtils {
 
     public static ResponseCookie generateCookie(String name, String value, long maxAge) {
         return ResponseCookie.from(name, value)

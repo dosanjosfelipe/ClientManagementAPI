@@ -8,44 +8,32 @@ import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.security.TokenType;
 import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.ClientService;
-import dev.felipe.clientmanagement.service.UserService;
-import dev.felipe.clientmanagement.utils.TokenUserExtractor;
-import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("api/v1/auth/clients")
+@RequestMapping("/api/v1/auth/clients")
 public class ClientController {
 
     private final ClientService clientService;
-    private final TokenUserExtractor tokenUserExtractor;
     private final AuthService authService;
-    private final UserService userService;
 
-    public ClientController(ClientService clientService,
-                            TokenUserExtractor tokenUserExtractor, AuthService authService, UserService userService) {
+    public ClientController(ClientService clientService, AuthService authService) {
         this.clientService = clientService;
-        this.tokenUserExtractor = tokenUserExtractor;
         this.authService = authService;
-        this.userService = userService;
     }
 
+    // CREATE
     @PostMapping
     public ResponseEntity<Map<String, String>> create(
-            @CookieValue(name = "access_token", required = false) String token,
-                                    @RequestBody @Valid ClientDTO dto) {
-
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        User user = tokenUserExtractor.extractUser(token);
+            @AuthenticationPrincipal User user,
+            @RequestBody @Valid ClientDTO dto) {
 
         clientService.saveClient(dto, user);
 
@@ -53,30 +41,17 @@ public class ClientController {
                 .body(Map.of("message","Cliente registrado com sucesso."));
     }
 
+    // READ
     @GetMapping()
     public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
-            @RequestHeader(name = "Authorization", required = false) String visitorToken,
+            @AuthenticationPrincipal User user,
             @RequestParam int page,
-            @RequestParam(required = false) String search,
-            @CookieValue(name = "access_token", required = false) String token) {
+            @RequestParam(required = false) String search) {
 
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        System.out.println("Entrou no Controller");
+        System.out.println("Usuário na Controller: " + user);
 
-        Page<Client> clients;
-
-        if (visitorToken != null) {
-            Claims claims = authService.validateToken(visitorToken);
-
-            Long ownerId = Long.valueOf(claims.getSubject());
-            User owner = userService.findUserById(ownerId);
-
-             clients = clientService.getClients(owner, page, search);
-        } else {
-            User user = tokenUserExtractor.extractUser(token);
-            clients = clientService.getClients(user, page, search);
-        }
+        Page<Client> clients = clientService.getClients(user, page, search);
 
         List<ClientResponseItemsDTO> response = clients.stream()
                 .map(client -> new ClientResponseItemsDTO(
@@ -94,46 +69,31 @@ public class ClientController {
 
     }
 
+    // UPDATE
     @PatchMapping("/{id}")
-    public ResponseEntity<Map<String, String>> update(@PathVariable String id,
-                                       @CookieValue(name = "access_token", required = false)
-                                       String token,
-                                       @RequestBody ClientDTO dto) {
+    public ResponseEntity<Map<String, String>> update(
+            @PathVariable Long id, @RequestBody ClientDTO dto) {
 
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        clientService.updateClient(Long.valueOf(id), dto);
+        clientService.updateClient(id, dto);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 Map.of("message", "Cliente editado com sucesso."));
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> delete(
-            @PathVariable String id,
-            @CookieValue(name = "access_token") String token) {
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
 
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        clientService.deleteClient(Long.valueOf(id));
+        clientService.deleteClient(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 Map.of("message", "Cliente deletado com sucesso."));
     }
 
+    // SHARE
     @GetMapping("/share")
     public ResponseEntity<Map<String, String>> share(
-            @CookieValue(name = "access_token") String token) {
-
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        User user = tokenUserExtractor.extractUser(token);
+            @AuthenticationPrincipal User user) {
 
         String readToken = authService.generateToken(user.getId(), null, null, TokenType.READ);
 

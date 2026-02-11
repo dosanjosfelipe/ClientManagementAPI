@@ -1,5 +1,6 @@
 package dev.felipe.clientmanagement.service;
 
+import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.repository.ClientRepository;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -20,9 +21,9 @@ public class ClientFilesService {
     }
 
     @Transactional(readOnly = true)
-    public void generateCSV(Long userId, OutputStream outputStream) throws IOException {
+    public void generateCSV(User user, OutputStream outputStream) throws IOException {
 
-        Stream<Client> clients = clientRepository.streamAllByOwnerId(userId);
+        Stream<Client> clients = clientRepository.streamAllByOwnerId(user.getId());
 
         BufferedWriter writer =
                 new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));

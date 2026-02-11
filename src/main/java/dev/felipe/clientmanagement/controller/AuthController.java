@@ -5,8 +5,7 @@ import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.UserService;
-import dev.felipe.clientmanagement.utils.CookieGenerator;
-import dev.felipe.clientmanagement.utils.TokenUserExtractor;
+import dev.felipe.clientmanagement.utils.CookieUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import static dev.felipe.clientmanagement.security.TokenType.ACCESS;
@@ -26,31 +26,18 @@ public class AuthController {
     private final AuthService authService;
     private final UserService userService;
 
-    public AuthController(AuthService authService, TokenUserExtractor tokenUserExtractor, UserService userService) {
+    public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
         this.userService = userService;
     }
 
     @PostMapping("/auth/refresh")
-    public ResponseEntity<Void> refreshAuth(@CookieValue(value = "refresh_token",
-            required = false) String refreshToken, HttpServletResponse response) {
-
-        if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        Claims claims = authService.validateToken(refreshToken);
-        String type = claims.get("type", String.class);
-
-        if (!"REFRESH".equals(type)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        User user = authService.findUserByClaim(claims);
+    public ResponseEntity<Void> refreshAuth(@AuthenticationPrincipal User user,
+                                            HttpServletResponse response) {
 
         String newAccessToken = authService.
                 generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
-        ResponseCookie newAccessCookie = CookieGenerator
+        ResponseCookie newAccessCookie = CookieUtils
                 .generateCookie("access_token", newAccessToken,3600);
 
         response.addHeader(HttpHeaders.SET_COOKIE, newAccessCookie.toString());
@@ -70,9 +57,9 @@ public class AuthController {
         String refreshToken = authService
                 .generateToken(user.getId(), user.getEmail(), user.getName(), REFRESH);
 
-        ResponseCookie accessCookie = CookieGenerator
+        ResponseCookie accessCookie = CookieUtils
                 .generateCookie("access_token", accessToken, 3600);
-        ResponseCookie refreshCookie = CookieGenerator
+        ResponseCookie refreshCookie = CookieUtils
                 .generateCookie("refresh_token", refreshToken, 604800);
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
@@ -99,9 +86,9 @@ public class AuthController {
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        ResponseCookie expiredAccessToken = CookieGenerator
+        ResponseCookie expiredAccessToken = CookieUtils
                 .generateCookie("access_token", accessToken, 0);
-        ResponseCookie expiredRefreshToken = CookieGenerator
+        ResponseCookie expiredRefreshToken = CookieUtils
                 .generateCookie("refresh_token", refreshToken, 0);
 
         response.addHeader(HttpHeaders.SET_COOKIE, expiredAccessToken.toString());
