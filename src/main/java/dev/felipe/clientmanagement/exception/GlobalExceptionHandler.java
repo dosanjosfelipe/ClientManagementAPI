@@ -6,6 +6,7 @@ import dev.felipe.clientmanagement.exception.domain.InvalidCredentials;
 import dev.felipe.clientmanagement.exception.domain.PhoneAlreadyExistsException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class GlobalExceptionHandler {
                 .body(Map.of("code", "TOKEN_EXPIRED"));
     }
 
-    @ExceptionHandler({JwtException.class, IllegalArgumentException.class })
+    @ExceptionHandler(JwtException.class)
     public ResponseEntity<Map<String, String>> handleJwtException() {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -72,5 +73,18 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", "Cliente não encontrado."));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException() {
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "Argumento passado inválido."));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConstraintViolationException(
+            ConstraintViolationException ex) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
 }
