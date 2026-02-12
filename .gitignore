@@ -4,6 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 **/src/main/resources/application.properties
+**/src/main/resources/clientmanagement.crt
+**/src/main/resources/clientmanagement.p12
 
 ### STS ###
 .apt_generated
