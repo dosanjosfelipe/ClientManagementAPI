@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("api/v1/auth/clients/files/")
 public class ClientFilesController {
@@ -36,8 +38,12 @@ public class ClientFilesController {
                 .body(stream);
     }
 
-    @PostMapping("/import")
-    public ResponseEntity<Void> importClient(@RequestParam("file") MultipartFile file) {
+    @PostMapping(path = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> importClients(
+            @AuthenticationPrincipal User user,
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        clientFilesService.importCSV(file, user);
 
         return ResponseEntity.ok().build();
     }

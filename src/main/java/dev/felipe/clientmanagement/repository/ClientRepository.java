@@ -1,6 +1,7 @@
 package dev.felipe.clientmanagement.repository;
 
 import dev.felipe.clientmanagement.model.Client;
+import dev.felipe.clientmanagement.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -41,4 +42,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Stream<Client> streamAllByOwnerId(
             @Param("ownerId") Long ownerId
     );
+
+    boolean findClientByOwner(User owner);
 }
