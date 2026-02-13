@@ -97,7 +97,7 @@ public class ClientController {
 
         String readToken = authService.generateToken(user.getId(), null, null, TokenType.READ);
 
-        String URL = "https://localhost:5173/dashboard/visitor?token=" + readToken;
+        String URL = "http://localhost:5173/dashboard/visitor?token=" + readToken;
 
         return ResponseEntity.status(HttpStatus.OK).body(Map.of("shareLink", URL));
     }
