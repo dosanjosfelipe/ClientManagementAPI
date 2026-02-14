@@ -10,6 +10,5 @@ public record UserLoginDTO(
         String email,
 
         @NotBlank
-        @Size(min=6, max=14)
         String password) {
 }
