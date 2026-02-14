@@ -4,7 +4,7 @@ import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
 import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
 import dev.felipe.clientmanagement.dto.user.UserUpdateDTO;
 import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
-import dev.felipe.clientmanagement.exception.domain.InvalidCredentials;
+import dev.felipe.clientmanagement.exception.domain.InvalidCredentialsException;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,7 +25,7 @@ public class UserService {
     public void saveUser(UserRegisterDTO dto) {
 
         if (userRepository.findByEmail(dto.email().toLowerCase()).isPresent()) {
-            throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyExistsException("Esse email já existe em outro cliente.");
         }
 
         User user = new User();
@@ -44,7 +44,7 @@ public class UserService {
                         new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            throw new InvalidCredentials();
+            throw new InvalidCredentialsException("Senha inválida.");
         }
 
         return user;
