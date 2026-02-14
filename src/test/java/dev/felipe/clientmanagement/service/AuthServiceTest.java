@@ -27,6 +27,7 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        // Chave aleatória criada para teste
         String VALID_SECRET_KEY = "VGhpcy1pcy1hLXZlcnktc2VjdXJlLWFuZC1sb25nLXNlY3JldC1rZXk=";
         authService = new AuthService(VALID_SECRET_KEY, userRepository);
     }
