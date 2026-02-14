@@ -29,7 +29,6 @@ public class ClientController {
         this.authService = authService;
     }
 
-    // CREATE
     @PostMapping
     public ResponseEntity<Map<String, String>> create(
             @AuthenticationPrincipal User user,
@@ -41,15 +40,11 @@ public class ClientController {
                 .body(Map.of("message","Cliente registrado com sucesso."));
     }
 
-    // READ
     @GetMapping()
     public ResponseEntity<ClientResponseDTO> getAllClientsByUser(
             @AuthenticationPrincipal User user,
             @RequestParam int page,
             @RequestParam(required = false) String search) {
-
-        System.out.println("Entrou no Controller");
-        System.out.println("Usuário na Controller: " + user);
 
         Page<Client> clients = clientService.getClients(user, page, search);
 
@@ -69,28 +64,28 @@ public class ClientController {
 
     }
 
-    // UPDATE
     @PatchMapping("/{id}")
     public ResponseEntity<Map<String, String>> update(
+            @AuthenticationPrincipal User user,
             @PathVariable Long id, @RequestBody ClientDTO dto) {
 
-        clientService.updateClient(id, dto);
+        clientService.updateClient(id, dto, user);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 Map.of("message", "Cliente editado com sucesso."));
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> delete(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long id) {
 
-        clientService.deleteClient(id);
+        clientService.deleteClient(id, user);
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 Map.of("message", "Cliente deletado com sucesso."));
     }
 
-    // SHARE
     @GetMapping("/share")
     public ResponseEntity<Map<String, String>> share(
             @AuthenticationPrincipal User user) {

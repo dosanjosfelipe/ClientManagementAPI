@@ -6,7 +6,6 @@ import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.service.AuthService;
 import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.CookieUtils;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;

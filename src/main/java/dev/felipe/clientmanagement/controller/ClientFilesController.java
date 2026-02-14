@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-
 import java.io.IOException;
 
 @RestController
@@ -38,7 +37,7 @@ public class ClientFilesController {
                 .body(stream);
     }
 
-    @PostMapping(path = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/import")
     public ResponseEntity<Void> importClients(
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file) throws IOException {

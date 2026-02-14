@@ -24,8 +24,6 @@ public class UserController {
     public ResponseEntity<Map<String, String>> getCurrentUser(
             @AuthenticationPrincipal User user) {
 
-        System.out.println("ENTROU NO CONTROLLER DO USER");
-        System.out.println("O user é: " + user.getName());
         String userId = String.valueOf(user.getId());
         String userName = user.getName();
 
