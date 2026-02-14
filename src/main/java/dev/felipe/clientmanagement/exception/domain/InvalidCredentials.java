@@ -1,8 +1,0 @@
-package dev.felipe.clientmanagement.exception.domain;
-
-public class InvalidCredentials extends RuntimeException {
-
-    public InvalidCredentials() {
-        super("Senha incorreta. Tente outra.");
-    }
-}

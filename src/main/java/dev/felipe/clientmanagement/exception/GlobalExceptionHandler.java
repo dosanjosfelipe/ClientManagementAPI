@@ -1,9 +1,6 @@
 package dev.felipe.clientmanagement.exception;
 
-import dev.felipe.clientmanagement.exception.domain.ClientNotFoundException;
-import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
-import dev.felipe.clientmanagement.exception.domain.InvalidCredentials;
-import dev.felipe.clientmanagement.exception.domain.PhoneAlreadyExistsException;
+import dev.felipe.clientmanagement.exception.domain.*;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.hibernate.exception.ConstraintViolationException;
@@ -19,65 +16,74 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists() {
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExistsException(
+            EmailAlreadyExistsException ex) {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "Esse email já foi registrado."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<Map<String, String>> handleDataBaseError() {
+    public ResponseEntity<Map<String, String>> handleDataAccessException(
+            DataAccessException ex) {
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("message", "Houve um erro no sistema, tente novamente mais tarde."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException() {
+    public ResponseEntity<Map<String, String>> handleUsernameNotFoundException(
+            UsernameNotFoundException ex) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", "Usuário não encontrado. Tente outro ou registre-se."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
-    @ExceptionHandler(InvalidCredentials.class)
-    public ResponseEntity<Map<String, String>> handleInvalidCredentials() {
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCredentials(
+            InvalidCredentialsException ex) {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "Usuário ou senha inválidos."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(ExpiredJwtException.class)
-    public ResponseEntity<Map<String, String>> handleExpiredToken() {
+    public ResponseEntity<Map<String, String>> handleExpiredJwtException(
+            ExpiredJwtException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("code", "TOKEN_EXPIRED"));
+                .body(Map.of("code", ex.getMessage()));
     }
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<Map<String, String>> handleJwtException() {
+    public ResponseEntity<Map<String, String>> handleJwtException(
+            JwtException ex) {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(Map.of("message", "Acesso negado: token de acesso inválido."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(PhoneAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handlePhoneAlreadyExistsException() {
+    public ResponseEntity<Map<String, String>> handlePhoneAlreadyExistsException(
+            PhoneAlreadyExistsException ex) {
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "Esse telefone já foi registrado."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(ClientNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleClientNotFoundException() {
+    public ResponseEntity<Map<String, String>> handleClientNotFoundException(
+            ClientNotFoundException ex) {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(Map.of("message", "Cliente não encontrado."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException() {
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(
+            IllegalArgumentException ex) {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Map.of("message", "Argumento passado inválido."));
+                .body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -85,6 +91,14 @@ public class GlobalExceptionHandler {
             ConstraintViolationException ex) {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(UserIsNotOwnerClientException.class)
+    public ResponseEntity<Map<String, String>> handleUserIsNotOwnerClientException(
+            UserIsNotOwnerClientException ex) {
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("message", ex.getMessage()));
     }
 }
