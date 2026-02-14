@@ -1,25 +1,16 @@
 package dev.felipe.clientmanagement.repository;
 
 import dev.felipe.clientmanagement.model.Client;
-import dev.felipe.clientmanagement.model.User;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.util.Optional;
+import org.springframework.stereotype.Repository;
 import java.util.stream.Stream;
 
+@Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
-    Optional<Client> findByEmail(@NotBlank @Email String email);
-
-    Optional<Client> findByPhone(@Pattern(regexp = "^[0-9]+$")
-                                 @NotBlank
-                                 @Size(min = 10, max = 11) String phone);
 
     @Query("""
     SELECT c
@@ -43,5 +34,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
             @Param("ownerId") Long ownerId
     );
 
-    boolean findClientByOwner(User owner);
+    boolean existsClientByEmail(String email);
+
+    boolean existsClientByPhone(String phone);
 }
