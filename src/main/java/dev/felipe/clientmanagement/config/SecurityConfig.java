@@ -1,5 +1,6 @@
 package dev.felipe.clientmanagement.config;
 
+import dev.felipe.clientmanagement.security.CustomAuthenticationEntryPoint;
 import dev.felipe.clientmanagement.security.filter.AccessReadTokenFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.DispatcherType;
@@ -35,7 +36,8 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers
                                 (DispatcherType.FORWARD, DispatcherType.ASYNC).permitAll()
                         .requestMatchers("/api/v1/auth/**").authenticated().anyRequest().permitAll()
-                )
+                ).exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .addFilterBefore(accessReadTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
