@@ -34,17 +34,13 @@ public class AccessReadTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String token = resolveToken(request);
-        System.out.println("Token resolvido: " + token);
 
         if (token != null) {
             try {
                 Claims claims = authService.validateToken(token);
-                System.out.println("Token validado com sucesso");
-                System.out.println("Tipo: " + claims.get("type"));
 
                 if (isSupportedTokenType(claims)) {
                     User user = authService.findUserByClaim(claims);
-                    System.out.println("Usuário encontrado pelo claim: " + user);
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
@@ -58,7 +54,6 @@ public class AccessReadTokenFilter extends OncePerRequestFilter {
                 }
 
             } catch (Exception ignored) {
-                System.out.println("Falha na validação");
                 SecurityContextHolder.clearContext();
             }
         }
@@ -67,10 +62,14 @@ public class AccessReadTokenFilter extends OncePerRequestFilter {
     }
 
     private String resolveToken(HttpServletRequest request) {
+
+        String accessToken = TokenUtils.extractAccessToken(request);
+        if (accessToken == null) return null;
+
         String visitorToken = TokenUtils.extractVisitorToken(request);
         if (visitorToken != null) return visitorToken;
 
-        return TokenUtils.extractAccessToken(request);
+        return accessToken;
     }
 
     private boolean isSupportedTokenType(Claims claims) {
