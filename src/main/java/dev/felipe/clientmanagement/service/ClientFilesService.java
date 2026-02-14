@@ -32,16 +32,16 @@ public class ClientFilesService {
     @Transactional(readOnly = true)
     public void generateCSV(User user, OutputStream outputStream) throws IOException {
 
-        Stream<Client> clients = clientRepository.streamAllByOwnerId(user.getId());
-
         BufferedWriter writer =
                 new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+
         CSVFormat format = CSVFormat.DEFAULT.builder().build();
 
-        CSVPrinter printer = new CSVPrinter(writer, format);
-        printer.printRecord("Nome", "Email", "Telefone", "Criado em", "Atualizado em");
+        try (Stream<Client> clients = clientRepository.streamAllByOwnerId(user.getId());
+             CSVPrinter printer = new CSVPrinter(writer, format)
+        ) {
+            printer.printRecord("Nome", "Email", "Telefone", "Criado em", "Atualizado em");
 
-        try {
             clients.forEach(client -> {
                 try {
                     printer.printRecord(
@@ -55,10 +55,7 @@ public class ClientFilesService {
                     throw new UncheckedIOException(e);
                 }
             });
-
             printer.flush();
-        } finally {
-            clients.close();
         }
     }
 
@@ -70,6 +67,7 @@ public class ClientFilesService {
         }
 
         List<Client> clients = new ArrayList<>();
+        // Suporta apenas datas no padrão americano
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         CSVFormat format = CSVFormat.DEFAULT.builder()
@@ -88,7 +86,7 @@ public class ClientFilesService {
 
                 client.setOwner(user);
                 client.setName(record.get("Nome"));
-                client.setEmail(record.get("Email"));
+                client.setEmail(record.get("Email").toLowerCase());
                 client.setPhone(record.get("Telefone"));
 
                 LocalDate createdDate = LocalDate.parse(record.get("Criado em"), dateFormatter);
@@ -110,8 +108,7 @@ public class ClientFilesService {
             throw new ConstraintViolationException(
                     "Campos únicos duplicados: " + e.getConstraintName(),
                     e.getSQLException(),
-                    e.getConstraintName()
-            );
+                    e.getConstraintName());
         }
     }
 }
