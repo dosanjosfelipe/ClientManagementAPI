@@ -73,10 +73,7 @@ public class AuthService {
 
     public Claims validateToken(String token) {
 
-        System.out.println("Entrou no validate");
-
         if (token == null) {
-            System.out.println("Token no validate null");
             throw new JwtException("Token Null");
         }
 
