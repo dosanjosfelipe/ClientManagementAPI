@@ -6,7 +6,6 @@ import dev.felipe.clientmanagement.security.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,32 +40,32 @@ public class AuthService {
 
         if (type == TokenType.REFRESH) {
             return Jwts.builder()
-                    .setSubject(String.valueOf(userId))
+                    .subject(String.valueOf(userId))
                     .claim("type", TokenType.REFRESH.name())
-                    .setIssuedAt(Date.from(now))
-                    .setExpiration(Date.from(now.plusSeconds(604800)))
-                    .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+                    .issuedAt(Date.from(now))
+                    .expiration(Date.from(now.plusSeconds(604800)))
+                    .signWith(SECRET_KEY)
                     .compact();
         }
 
         if (type == TokenType.ACCESS) {
             return Jwts.builder()
-                    .setSubject(String.valueOf(userId))
+                    .subject(String.valueOf(userId))
                     .claim("email", email)
                     .claim("name", name)
                     .claim("type", TokenType.ACCESS.name())
-                    .setIssuedAt(Date.from(now))
-                    .setExpiration(Date.from(now.plusSeconds(3600)))
-                    .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+                    .issuedAt(Date.from(now))
+                    .expiration(Date.from(now.plusSeconds(3600)))
+                    .signWith(SECRET_KEY)
                     .compact();
         }
 
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .subject(String.valueOf(userId))
                 .claim("type", TokenType.READ.name())
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plusSeconds(3600)))
-                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusSeconds(3600)))
+                .signWith(SECRET_KEY)
                 .compact();
 
     }
@@ -78,11 +77,11 @@ public class AuthService {
         }
 
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY)
+            return Jwts.parser()
+                    .verifyWith(SECRET_KEY)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtException("Token inválido.");
         }
