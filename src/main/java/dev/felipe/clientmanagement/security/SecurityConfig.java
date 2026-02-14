@@ -1,6 +1,5 @@
-package dev.felipe.clientmanagement.config;
+package dev.felipe.clientmanagement.security;
 
-import dev.felipe.clientmanagement.security.CustomAuthenticationEntryPoint;
 import dev.felipe.clientmanagement.security.filter.AccessReadTokenFilter;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.DispatcherType;
