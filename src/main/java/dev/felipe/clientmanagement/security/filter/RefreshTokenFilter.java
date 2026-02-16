@@ -2,7 +2,8 @@ package dev.felipe.clientmanagement.security.filter;
 
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.security.TokenType;
-import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.security.JwtService;
+import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.TokenUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -21,10 +22,12 @@ import java.util.List;
 @Component
 public class RefreshTokenFilter extends OncePerRequestFilter {
 
-    private final AuthService authService;
+    private final JwtService jwtService;
+    private final UserService userService;
 
-    public RefreshTokenFilter(AuthService authService) {
-        this.authService = authService;
+    public RefreshTokenFilter(JwtService jwtService, UserService userService) {
+        this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     @Override
@@ -37,11 +40,11 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
 
         if (refreshToken != null) {
             try {
-                Claims claims = authService.validateToken(refreshToken);
+                Claims claims = jwtService.validateToken(refreshToken);
                 String type = claims.get("type", String.class);
 
                 if (TokenType.REFRESH.name().equals(type)) {
-                    User user = authService.findUserByClaim(claims);
+                    User user = userService.findUserByClaim(claims);
 
                     if (user != null) {
                         UsernamePasswordAuthenticationToken authentication =

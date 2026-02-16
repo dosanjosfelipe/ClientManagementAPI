@@ -7,6 +7,7 @@ import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
 import dev.felipe.clientmanagement.exception.domain.InvalidCredentialsException;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,9 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -212,6 +211,39 @@ class UserServiceTest {
             assertThrows(UsernameNotFoundException.class, () -> userService.deleteUser(userId));
 
             verify(userRepository, never()).delete(any(User.class));
+        }
+    }
+    @Nested
+    @DisplayName("Find User By Claim Operations")
+    class FindUserByClaimOperations {
+
+        @Test
+        void shouldFindUserSuccessfully() {
+            Claims claimsMock = mock(Claims.class);
+            when(claimsMock.getSubject()).thenReturn("1");
+
+            User expectedUser = new User();
+            expectedUser.setId(1L);
+
+            when(userRepository.findById(1L)).thenReturn(Optional.of(expectedUser));
+
+            User result = userService.findUserByClaim(claimsMock);
+
+            assertNotNull(result);
+            assertEquals(1L, result.getId());
+            verify(userRepository).findById(1L);
+        }
+
+        @Test
+        void shouldThrowUsernameNotFoundWhenUserDoesNotExist() {
+            Claims claimsMock = mock(Claims.class);
+            when(claimsMock.getSubject()).thenReturn("99");
+
+            when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThrows(UsernameNotFoundException.class, () -> userService.findUserByClaim(claimsMock));
+
+            verify(userRepository).findById(99L);
         }
     }
 }

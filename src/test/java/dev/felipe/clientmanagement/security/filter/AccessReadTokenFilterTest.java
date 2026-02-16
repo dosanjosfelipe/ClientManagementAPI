@@ -2,7 +2,8 @@ package dev.felipe.clientmanagement.security.filter;
 
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.security.TokenType;
-import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.security.JwtService;
+import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.TokenUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -25,7 +26,10 @@ import static org.mockito.Mockito.*;
 class AccessReadTokenFilterTest {
 
     @Mock
-    private AuthService authService;
+    private JwtService jwtService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private HttpServletRequest request;
@@ -43,7 +47,7 @@ class AccessReadTokenFilterTest {
 
     @BeforeEach
     void setUp() {
-        filter = new AccessReadTokenFilter(authService);
+        filter = new AccessReadTokenFilter(jwtService, userService);
         SecurityContextHolder.clearContext();
     }
 
@@ -61,9 +65,9 @@ class AccessReadTokenFilterTest {
                 mockedTokenUtils.when(() -> TokenUtils.extractVisitorToken(request)).thenReturn(null);
                 mockedTokenUtils.when(() -> TokenUtils.extractAccessToken(request)).thenReturn(token);
 
-                when(authService.validateToken(token)).thenReturn(claims);
+                when(jwtService.validateToken(token)).thenReturn(claims);
                 when(claims.get("type", String.class)).thenReturn(TokenType.ACCESS.name());
-                when(authService.findUserByClaim(claims)).thenReturn(user);
+                when(userService.findUserByClaim(claims)).thenReturn(user);
 
                 filter.doFilterInternal(request, response, filterChain);
 
@@ -84,9 +88,9 @@ class AccessReadTokenFilterTest {
                 mockedTokenUtils.when(() -> TokenUtils.extractVisitorToken(request)).thenReturn(null);
                 mockedTokenUtils.when(() -> TokenUtils.extractAccessToken(request)).thenReturn(token);
 
-                when(authService.validateToken(token)).thenReturn(claims);
+                when(jwtService.validateToken(token)).thenReturn(claims);
                 when(claims.get("type", String.class)).thenReturn(TokenType.READ.name());
-                when(authService.findUserByClaim(claims)).thenReturn(user);
+                when(userService.findUserByClaim(claims)).thenReturn(user);
 
                 filter.doFilterInternal(request, response, filterChain);
 
@@ -111,16 +115,16 @@ class AccessReadTokenFilterTest {
                 mockedTokenUtils.when(() -> TokenUtils.extractVisitorToken(request)).thenReturn(visitorToken);
                 mockedTokenUtils.when(() -> TokenUtils.extractAccessToken(request)).thenReturn(accessToken);
 
-                when(authService.validateToken(visitorToken)).thenReturn(claims);
+                when(jwtService.validateToken(visitorToken)).thenReturn(claims);
                 when(claims.get("type", String.class)).thenReturn(TokenType.READ.name());
-                when(authService.findUserByClaim(claims)).thenReturn(visitorUser);
+                when(userService.findUserByClaim(claims)).thenReturn(visitorUser);
 
                 filter.doFilterInternal(request, response, filterChain);
 
                 assertEquals(visitorUser, Objects.requireNonNull(
                         SecurityContextHolder.getContext().getAuthentication()).getPrincipal());
-                verify(authService).validateToken(visitorToken);
-                verify(authService, never()).validateToken(accessToken);
+                verify(jwtService).validateToken(visitorToken);
+                verify(jwtService, never()).validateToken(accessToken);
             }
         }
     }
@@ -137,7 +141,7 @@ class AccessReadTokenFilterTest {
                 mockedTokenUtils.when(() -> TokenUtils.extractVisitorToken(request)).thenReturn(null);
                 mockedTokenUtils.when(() -> TokenUtils.extractAccessToken(request)).thenReturn(token);
 
-                when(authService.validateToken(token)).thenThrow(new RuntimeException("Expired or Malformed"));
+                when(jwtService.validateToken(token)).thenThrow(new RuntimeException("Expired or Malformed"));
 
                 filter.doFilterInternal(request, response, filterChain);
 
@@ -154,13 +158,13 @@ class AccessReadTokenFilterTest {
                 mockedTokenUtils.when(() -> TokenUtils.extractVisitorToken(request)).thenReturn(null);
                 mockedTokenUtils.when(() -> TokenUtils.extractAccessToken(request)).thenReturn(token);
 
-                when(authService.validateToken(token)).thenReturn(claims);
+                when(jwtService.validateToken(token)).thenReturn(claims);
                 when(claims.get("type", String.class)).thenReturn("REFRESH");
 
                 filter.doFilterInternal(request, response, filterChain);
 
                 assertNull(SecurityContextHolder.getContext().getAuthentication());
-                verify(authService, never()).findUserByClaim(any());
+                verify(userService, never()).findUserByClaim(any());
             }
         }
 
@@ -173,7 +177,7 @@ class AccessReadTokenFilterTest {
                 filter.doFilterInternal(request, response, filterChain);
 
                 assertNull(SecurityContextHolder.getContext().getAuthentication());
-                verify(authService, never()).validateToken(any());
+                verify(jwtService, never()).validateToken(any());
                 verify(filterChain).doFilter(request, response);
             }
         }

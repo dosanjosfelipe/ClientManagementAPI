@@ -6,7 +6,7 @@ import dev.felipe.clientmanagement.dto.client.ClientResponseItemsDTO;
 import dev.felipe.clientmanagement.model.Client;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.security.TokenType;
-import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.security.JwtService;
 import dev.felipe.clientmanagement.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -22,11 +22,11 @@ import java.util.Map;
 public class ClientController {
 
     private final ClientService clientService;
-    private final AuthService authService;
+    private final JwtService jwtService;
 
-    public ClientController(ClientService clientService, AuthService authService) {
+    public ClientController(ClientService clientService, JwtService jwtService) {
         this.clientService = clientService;
-        this.authService = authService;
+        this.jwtService = jwtService;
     }
 
     @PostMapping
@@ -90,7 +90,7 @@ public class ClientController {
     public ResponseEntity<Map<String, String>> share(
             @AuthenticationPrincipal User user) {
 
-        String readToken = authService.generateToken(user.getId(), null, null, TokenType.READ);
+        String readToken = jwtService.generateToken(user.getId(), null, null, TokenType.READ);
 
         String URL = "http://localhost:5173/dashboard/visitor?token=" + readToken;
 

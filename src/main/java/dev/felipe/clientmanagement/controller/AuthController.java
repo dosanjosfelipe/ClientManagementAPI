@@ -3,7 +3,7 @@ package dev.felipe.clientmanagement.controller;
 import dev.felipe.clientmanagement.dto.user.UserLoginDTO;
 import dev.felipe.clientmanagement.dto.user.UserRegisterDTO;
 import dev.felipe.clientmanagement.model.User;
-import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.security.JwtService;
 import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.CookieUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,11 +22,11 @@ import static dev.felipe.clientmanagement.security.TokenType.REFRESH;
 @RequestMapping("/api/v1")
 public class AuthController {
 
-    private final AuthService authService;
+    private final JwtService jwtService;
     private final UserService userService;
 
-    public AuthController(AuthService authService, UserService userService) {
-        this.authService = authService;
+    public AuthController(JwtService jwtService, UserService userService) {
+        this.jwtService = jwtService;
         this.userService = userService;
     }
 
@@ -34,7 +34,7 @@ public class AuthController {
     public ResponseEntity<Void> refreshAuth(@AuthenticationPrincipal User user,
                                             HttpServletResponse response) {
 
-        String newAccessToken = authService.
+        String newAccessToken = jwtService.
                 generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
         ResponseCookie newAccessCookie = CookieUtils
                 .generateCookie("access_token", newAccessToken,3600);
@@ -51,9 +51,9 @@ public class AuthController {
 
         User user = userService.authenticateUser(dto);
 
-        String accessToken = authService
+        String accessToken = jwtService
                 .generateToken(user.getId(), user.getEmail(), user.getName(), ACCESS);
-        String refreshToken = authService
+        String refreshToken = jwtService
                 .generateToken(user.getId(), user.getEmail(), user.getName(), REFRESH);
 
         ResponseCookie accessCookie = CookieUtils
@@ -82,7 +82,7 @@ public class AuthController {
             HttpServletResponse response) {
 
         if (accessToken == null) {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         ResponseCookie expiredAccessToken = CookieUtils

@@ -2,7 +2,8 @@ package dev.felipe.clientmanagement.security.filter;
 
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.security.TokenType;
-import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.security.JwtService;
+import dev.felipe.clientmanagement.service.UserService;
 import dev.felipe.clientmanagement.utils.TokenUtils;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -25,7 +26,10 @@ import static org.mockito.Mockito.*;
 class RefreshTokenFilterTest {
 
     @Mock
-    private AuthService authService;
+    private JwtService jwtService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     private HttpServletRequest request;
@@ -43,7 +47,7 @@ class RefreshTokenFilterTest {
 
     @BeforeEach
     void setUp() {
-        filter = new RefreshTokenFilter(authService);
+        filter = new RefreshTokenFilter(jwtService, userService);
         SecurityContextHolder.clearContext();
     }
 
@@ -60,9 +64,9 @@ class RefreshTokenFilterTest {
             try (MockedStatic<TokenUtils> mockedTokenUtils = mockStatic(TokenUtils.class)) {
                 mockedTokenUtils.when(() -> TokenUtils.extractRefreshToken(request)).thenReturn(token);
 
-                when(authService.validateToken(token)).thenReturn(claims);
+                when(jwtService.validateToken(token)).thenReturn(claims);
                 when(claims.get("type", String.class)).thenReturn(TokenType.REFRESH.name());
-                when(authService.findUserByClaim(claims)).thenReturn(user);
+                when(userService.findUserByClaim(claims)).thenReturn(user);
 
                 filter.doFilterInternal(request, response, filterChain);
 
@@ -80,13 +84,13 @@ class RefreshTokenFilterTest {
             try (MockedStatic<TokenUtils> mockedTokenUtils = mockStatic(TokenUtils.class)) {
                 mockedTokenUtils.when(() -> TokenUtils.extractRefreshToken(request)).thenReturn(token);
 
-                when(authService.validateToken(token)).thenReturn(claims);
+                when(jwtService.validateToken(token)).thenReturn(claims);
                 when(claims.get("type", String.class)).thenReturn(TokenType.ACCESS.name());
 
                 filter.doFilterInternal(request, response, filterChain);
 
                 assertNull(SecurityContextHolder.getContext().getAuthentication());
-                verify(authService, never()).findUserByClaim(any());
+                verify(userService, never()).findUserByClaim(any());
                 verify(filterChain).doFilter(request, response);
             }
         }
@@ -97,7 +101,7 @@ class RefreshTokenFilterTest {
 
             try (MockedStatic<TokenUtils> mockedTokenUtils = mockStatic(TokenUtils.class)) {
                 mockedTokenUtils.when(() -> TokenUtils.extractRefreshToken(request)).thenReturn(token);
-                when(authService.validateToken(token)).thenThrow(new RuntimeException("Expired"));
+                when(jwtService.validateToken(token)).thenThrow(new RuntimeException("Expired"));
 
                 filter.doFilterInternal(request, response, filterChain);
 

@@ -1,7 +1,8 @@
 package dev.felipe.clientmanagement.security.filter;
 
 import dev.felipe.clientmanagement.model.User;
-import dev.felipe.clientmanagement.service.AuthService;
+import dev.felipe.clientmanagement.security.JwtService;
+import dev.felipe.clientmanagement.service.UserService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,10 +22,12 @@ import dev.felipe.clientmanagement.security.TokenType;
 @Component
 public class AccessReadTokenFilter extends OncePerRequestFilter {
 
-    private final AuthService authService;
+    private final JwtService jwtService;
+    private final UserService userService;
 
-    public AccessReadTokenFilter(AuthService authService) {
-        this.authService = authService;
+    public AccessReadTokenFilter(JwtService jwtService, UserService userService) {
+        this.jwtService = jwtService;
+        this.userService = userService;
     }
 
     @Override
@@ -37,10 +40,10 @@ public class AccessReadTokenFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                Claims claims = authService.validateToken(token);
+                Claims claims = jwtService.validateToken(token);
 
                 if (isSupportedTokenType(claims)) {
-                    User user = authService.findUserByClaim(claims);
+                    User user = userService.findUserByClaim(claims);
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(

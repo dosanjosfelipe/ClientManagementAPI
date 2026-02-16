@@ -7,6 +7,7 @@ import dev.felipe.clientmanagement.exception.domain.EmailAlreadyExistsException;
 import dev.felipe.clientmanagement.exception.domain.InvalidCredentialsException;
 import dev.felipe.clientmanagement.model.User;
 import dev.felipe.clientmanagement.repository.UserRepository;
+import io.jsonwebtoken.Claims;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -66,5 +67,11 @@ public class UserService {
         user.setName(dto.username());
 
         userRepository.save(user);
+    }
+
+    public User findUserByClaim(Claims claims) {
+        return userRepository.findById(Long.valueOf(claims.getSubject()))
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Usuário não encontrado. Tente outro ou registre-se."));
     }
 }
