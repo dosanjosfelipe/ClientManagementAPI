@@ -6,12 +6,13 @@ O objetivo desse projeto é presentar minhas habilidades como desenvolvedor back
 ---
 
 ## Acesse
-Esse projeto está no ar nesse momento, para testá-lo agora acesse: www.meucodigo.com
+Esse projeto está no ar nesse momento, para testá-lo agora acesse: https://clientmgt.vercel.app/  
+__O site pode apresentar lentidão por ser um servidor gratuito__
 
 ---
 
 ## Frontend
-Existe também um frontend que consome essa API, peço que não se atente ao código (React + Typescript) tendo em vista que não é o foco do projeto, mas se quiser [clique aqui]().
+Existe também um frontend que consome essa API, peço que não se atente ao código (React + Typescript) tendo em vista que não é o foco do projeto, mas se quiser [clique aqui](https://github.com/dosanjosfelipe/ClientManagementFront).
 
 ---
 
